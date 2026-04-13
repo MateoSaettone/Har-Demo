@@ -79,10 +79,12 @@ export class SensorCapture {
     if (this._buffer.length > this.windowSize) this._buffer.shift();
     this._samplesSinceLastEmit += 1;
 
-    // Emit whenever we have a full window and have accumulated 50% new samples.
-    const halfWindow = this.windowSize >> 1;
+    // Emit every ~0.32 s so the display feels live. Window still spans the
+    // last 2.56 s (what the CNN was trained on); we just slide it faster.
+    // 16 samples @ 50 Hz = 320 ms cadence.
+    const hopSamples = Math.max(1, Math.round(this.sampleRateHz * 0.32));
     if (this._buffer.length === this.windowSize &&
-        this._samplesSinceLastEmit >= halfWindow) {
+        this._samplesSinceLastEmit >= hopSamples) {
       this._samplesSinceLastEmit = 0;
       try { this.onWindow?.(this._buffer.slice()); } catch (err) {
         console.error("onWindow handler threw", err);
