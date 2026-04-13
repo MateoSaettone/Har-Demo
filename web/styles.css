@@ -42,11 +42,22 @@ html, body {
   justify-content: space-between;
 }
 
+.brand-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
 .brand {
   font-weight: 800;
   letter-spacing: 3px;
   font-size: 18px;
+  color: var(--fg);
+}
+.subtitle {
+  font-size: 11px;
+  letter-spacing: 1.5px;
   color: var(--muted);
+  text-transform: uppercase;
 }
 
 .pill {
@@ -185,6 +196,75 @@ html, body {
   letter-spacing: 0.5px;
   min-height: 16px;
 }
+
+.about {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 14px 12px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+}
+.about__title {
+  color: var(--fg);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.2px;
+  line-height: 1.35;
+}
+.about__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.chip {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #0b1018;
+  border: 1px solid var(--border);
+  color: var(--fg);
+}
+.about__more summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  user-select: none;
+  padding: 4px 0;
+}
+.about__grid {
+  margin: 8px 0 0;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  column-gap: 14px;
+  row-gap: 6px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+.about__grid dt {
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 10px;
+  padding-top: 2px;
+}
+.about__grid dd {
+  margin: 0;
+  color: var(--fg);
+}
+.link {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px dashed var(--accent-strong);
+}
+.link:hover { color: var(--fg); border-bottom-color: var(--fg); }
 
 .debug {
   margin-top: 10px;

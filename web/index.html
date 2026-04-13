@@ -13,7 +13,10 @@
 <body>
   <main id="app">
     <header class="top">
-      <div class="brand">HAR</div>
+      <div class="brand-wrap">
+        <div class="brand">HAR</div>
+        <div class="subtitle">Human Activity Recognition · CIS4930</div>
+      </div>
       <div id="status-pill" class="pill pill--idle">idle</div>
     </header>
 
@@ -37,6 +40,26 @@
     </section>
 
     <footer class="bottom">
+      <section class="about" aria-label="About this project">
+        <div class="about__title">Smartphone-Based Human Activity Recognition Using Inertial Sensors</div>
+        <div class="about__chips">
+          <span class="chip">Mateo Saettone</span>
+          <span class="chip">Tomas Pastore Godoy</span>
+          <span class="chip">Ethan Thompson</span>
+        </div>
+        <details class="about__more">
+          <summary>project details</summary>
+          <dl class="about__grid">
+            <dt>course</dt>       <dd>CIS4930 — Wireless and Mobile Computing</dd>
+            <dt>instructor</dt>   <dd>Dr. Yili Ren</dd>
+            <dt>school</dt>       <dd>University of South Florida · Spring 2026</dd>
+            <dt>dataset</dt>      <dd>UCI HAR — 30 subjects, 6 activities, 50 Hz accel + gyro</dd>
+            <dt>model</dt>        <dd>1D CNN · 90.5% test accuracy (Random Forest baseline 85.3%)</dd>
+            <dt>pipeline</dt>     <dd>DeviceMotion → 2.56 s window → ONNX Runtime Web → Supabase Realtime Broadcast</dd>
+            <dt>source</dt>       <dd><a class="link" href="https://github.com/MateoSaettone/Har-Demo" target="_blank" rel="noopener">github.com/MateoSaettone/Har-Demo</a></dd>
+          </dl>
+        </details>
+      </section>
       <div id="meta" class="meta"></div>
       <details id="debug" class="debug">
         <summary>debug</summary>
