@@ -1,0 +1,60 @@
+{
+  "window": 128,
+  "sample_rate_hz": 50,
+  "channels": [
+    "body_acc_x",
+    "body_acc_y",
+    "body_acc_z",
+    "body_gyro_x",
+    "body_gyro_y",
+    "body_gyro_z",
+    "total_acc_x",
+    "total_acc_y",
+    "total_acc_z"
+  ],
+  "labels": [
+    "WALKING",
+    "WALKING_UPSTAIRS",
+    "WALKING_DOWNSTAIRS",
+    "SITTING",
+    "STANDING",
+    "LAYING"
+  ],
+  "mean": [
+    -0.0006363163120113313,
+    -0.0002922959974966943,
+    -0.0002753041626419872,
+    0.0005063982680439949,
+    -0.0008237347356043756,
+    0.00011293507122900337,
+    0.8039517998695374,
+    0.028755413368344307,
+    0.08649728447198868
+  ],
+  "std": [
+    0.19478364288806915,
+    0.12235898524522781,
+    0.10680177062749863,
+    0.4066532850265503,
+    0.38166430592536926,
+    0.25563251972198486,
+    0.41408979892730713,
+    0.39084190130233765,
+    0.35768282413482666
+  ],
+  "input_conventions": {
+    "acc_units": "g (divide m/s^2 by 9.80665)",
+    "gyro_units": "rad/s (multiply deg/s by pi/180)",
+    "channel_order": [
+      "body_acc_x",
+      "body_acc_y",
+      "body_acc_z",
+      "body_gyro_x",
+      "body_gyro_y",
+      "body_gyro_z",
+      "total_acc_x",
+      "total_acc_y",
+      "total_acc_z"
+    ]
+  }
+}

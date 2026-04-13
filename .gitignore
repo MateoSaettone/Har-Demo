@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+
+# Training artifacts
+training/data/
+training/checkpoints/
+training/artifacts/
+*.h5
+*.keras
+
+# TF.js exported model goes into web/model/ — commit it so Vercel can serve it
+# (if it ever grows too big, switch to Git LFS)
+
+# Node / Vercel
+node_modules/
+.vercel/
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+
+# web/js/config.js is committed — the Supabase anon key is safe to ship in
+# browser code (we only use Realtime Broadcast). Keep .env.local ignored.

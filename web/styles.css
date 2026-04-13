@@ -1,0 +1,191 @@
+:root {
+  --bg: #0b0d10;
+  --fg: #e6edf3;
+  --muted: #8b949e;
+  --accent: #7cf;
+  --accent-strong: #4ac;
+  --danger: #f87171;
+  --ok: #34d399;
+  --warn: #fbbf24;
+  --card: #11151a;
+  --border: #1f2833;
+  --radius: 18px;
+  --safe-top: env(safe-area-inset-top, 0);
+  --safe-bot: env(safe-area-inset-bottom, 0);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui,
+               "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+
+#app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: calc(16px + var(--safe-top)) 20px calc(16px + var(--safe-bot));
+  gap: 24px;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  font-weight: 800;
+  letter-spacing: 3px;
+  font-size: 18px;
+  color: var(--muted);
+}
+
+.pill {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+.pill--idle { color: var(--muted); }
+.pill--viewing { color: var(--accent); border-color: var(--accent-strong); }
+.pill--tracking { color: var(--ok); border-color: #14532d; background: #052e1a; }
+.pill--error { color: var(--danger); border-color: #7f1d1d; background: #2a0e0e; }
+
+.stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 24px;
+  padding: 16px 0;
+}
+
+.label {
+  font-weight: 900;
+  font-size: clamp(48px, 14vw, 128px);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  padding: 0 8px;
+  word-break: break-word;
+  transition: color 180ms ease;
+}
+.label--idle { color: var(--muted); }
+.label--walking { color: #60a5fa; }
+.label--walking_upstairs { color: #a78bfa; }
+.label--walking_downstairs { color: #f472b6; }
+.label--sitting { color: #34d399; }
+.label--standing { color: #fbbf24; }
+.label--laying { color: #22d3ee; }
+.label--stationary { color: #34d399; }
+.label--moving { color: #60a5fa; }
+
+.confidence {
+  width: min(520px, 100%);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "bar bar"
+    "txt txt";
+  gap: 8px;
+  align-items: center;
+}
+.confidence__bar {
+  grid-area: bar;
+  height: 10px;
+  background: var(--card);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid var(--border);
+}
+.confidence__bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: var(--w, 0%);
+  background: linear-gradient(90deg, var(--accent-strong), var(--accent));
+  transition: width 220ms ease;
+}
+.confidence__text {
+  grid-area: txt;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: 0.5px;
+}
+
+.source {
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: 0.5px;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.btn {
+  font: inherit;
+  padding: 18px 20px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--fg);
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+}
+.btn:active { transform: scale(0.98); }
+.btn--primary {
+  background: var(--accent);
+  color: #001018;
+  border-color: var(--accent);
+}
+.btn--ghost {
+  background: transparent;
+}
+
+.hidden { display: none !important; }
+
+.msg {
+  color: var(--muted);
+  font-size: 13px;
+  min-height: 18px;
+  text-align: center;
+}
+.msg--err { color: var(--danger); }
+.msg--warn { color: var(--warn); }
+.msg--ok { color: var(--ok); }
+
+.bottom {
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.5px;
+  min-height: 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confidence__bar::after, .label { transition: none; }
+}
