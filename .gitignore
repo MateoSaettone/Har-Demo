@@ -29,3 +29,4 @@ node_modules/
 
 # web/js/config.js is committed — the Supabase anon key is safe to ship in
 # browser code (we only use Realtime Broadcast). Keep .env.local ignored.
+.vercel

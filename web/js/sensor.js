@@ -21,7 +21,17 @@ export class SensorCapture {
     this._samplesSinceLastEmit = 0;
     this._running = false;
     this._eventSeen = false;
+    // Running gravity estimate (low-pass filter on total acc). Used to
+    // synthesize body_acc when the device doesn't provide it directly.
+    // alpha ≈ exp(-2π·0.3/50) matches UCI HAR's 0.3 Hz cutoff at 50 Hz.
+    this._gravity = null;
+    this._gravityAlpha = 0.96;
+    this._bodyAccSource = "unknown"; // "hardware" | "filtered" | "unknown"
+    this._lastSample = null;        // latest 9-channel sample for debug
   }
+
+  getBodyAccSource() { return this._bodyAccSource; }
+  getLastSample() { return this._lastSample; }
 
   static async requestPermission() {
     const Need = typeof DeviceMotionEvent !== "undefined" &&
@@ -98,23 +108,38 @@ export class SensorCapture {
       bax = (bodyM.x ?? 0) / GRAVITY;
       bay = (bodyM.y ?? 0) / GRAVITY;
       baz = (bodyM.z ?? 0) / GRAVITY;
+      this._bodyAccSource = "hardware";
     } else {
-      // Fallback: approximate body_acc by subtracting a running gravity estimate.
-      // We don't track gravity over time here; use (total - unit_gravity_guess).
-      // The CNN is normalized per-channel so constant offsets are absorbed at
-      // the first batch-norm / mean-subtraction step.
-      bax = tax; bay = tay; baz = taz;
+      // Low-pass filter to estimate gravity, then subtract from total.
+      // Matches UCI HAR's 0.3 Hz Butterworth split between gravity and body.
+      if (!this._gravity) this._gravity = { x: tax, y: tay, z: taz };
+      const a = this._gravityAlpha;
+      this._gravity.x = a * this._gravity.x + (1 - a) * tax;
+      this._gravity.y = a * this._gravity.y + (1 - a) * tay;
+      this._gravity.z = a * this._gravity.z + (1 - a) * taz;
+      bax = tax - this._gravity.x;
+      bay = tay - this._gravity.y;
+      baz = taz - this._gravity.z;
+      this._bodyAccSource = "filtered";
     }
 
+    // DeviceMotionEventRotationRate.alpha/beta/gamma are rotation rates
+    // around the Z / X / Y axes respectively (in deg/s). Map to UCI HAR's
+    // body_gyro_{x,y,z} accordingly.
     let gx = 0, gy = 0, gz = 0;
     if (gyro) {
-      gx = (gyro.alpha ?? gyro.x ?? 0) * DEG_TO_RAD;
-      gy = (gyro.beta  ?? gyro.y ?? 0) * DEG_TO_RAD;
-      gz = (gyro.gamma ?? gyro.z ?? 0) * DEG_TO_RAD;
+      const rx = gyro.beta  ?? gyro.x ?? 0; // rotation around X
+      const ry = gyro.gamma ?? gyro.y ?? 0; // rotation around Y
+      const rz = gyro.alpha ?? gyro.z ?? 0; // rotation around Z
+      gx = rx * DEG_TO_RAD;
+      gy = ry * DEG_TO_RAD;
+      gz = rz * DEG_TO_RAD;
     }
 
     // Channel order must match preprocessing.json:
     //   body_acc_{x,y,z}, body_gyro_{x,y,z}, total_acc_{x,y,z}
-    return [bax, bay, baz, gx, gy, gz, tax, tay, taz];
+    const sample = [bax, bay, baz, gx, gy, gz, tax, tay, taz];
+    this._lastSample = sample;
+    return sample;
   }
 }

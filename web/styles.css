@@ -186,6 +186,44 @@ html, body {
   min-height: 16px;
 }
 
+.debug {
+  margin-top: 10px;
+  text-align: left;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+.debug summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  user-select: none;
+}
+.debug__body {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--fg);
+}
+.debug__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.debug__row span:first-child { color: var(--muted); }
+.debug__probs {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 12px;
+  margin-top: 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .confidence__bar::after, .label { transition: none; }
 }

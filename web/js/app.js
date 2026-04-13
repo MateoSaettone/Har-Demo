@@ -19,7 +19,48 @@ const els = {
   btnStop: document.getElementById("btn-stop"),
   msg: document.getElementById("msg"),
   meta: document.getElementById("meta"),
+  dbg: {
+    bodySrc: document.getElementById("dbg-bodysrc"),
+    rate: document.getElementById("dbg-rate"),
+    bacc: document.getElementById("dbg-bacc"),
+    tacc: document.getElementById("dbg-tacc"),
+    gyro: document.getElementById("dbg-gyro"),
+    probs: document.getElementById("dbg-probs"),
+  },
 };
+
+let eventCount = 0;
+let lastRateStamp = performance.now();
+function bumpEventRate() {
+  eventCount++;
+  const now = performance.now();
+  if (now - lastRateStamp >= 1000) {
+    const rate = eventCount * 1000 / (now - lastRateStamp);
+    if (els.dbg.rate) els.dbg.rate.textContent = rate.toFixed(1) + " Hz";
+    eventCount = 0;
+    lastRateStamp = now;
+  }
+}
+function fmtTriplet(a, b, c) {
+  return `${a.toFixed(2)} ${b.toFixed(2)} ${c.toFixed(2)}`;
+}
+function renderDebug(sensor, pred) {
+  if (!els.dbg.bodySrc) return;
+  els.dbg.bodySrc.textContent = sensor?.getBodyAccSource() ?? "—";
+  const s = sensor?.getLastSample();
+  if (s) {
+    els.dbg.bacc.textContent = fmtTriplet(s[0], s[1], s[2]);
+    els.dbg.gyro.textContent = fmtTriplet(s[3], s[4], s[5]);
+    els.dbg.tacc.textContent = fmtTriplet(s[6], s[7], s[8]);
+  }
+  if (pred?.probs && els.dbg.probs) {
+    const labels = getLabels();
+    const rows = pred.probs.map((p, i) =>
+      `<div>${labels[i]}</div><div>${(p * 100).toFixed(1)}%</div>`
+    );
+    els.dbg.probs.innerHTML = rows.join("");
+  }
+}
 
 const STALE_MS = 3000;
 let lastRemoteTs = 0;
@@ -118,12 +159,16 @@ async function startTracking() {
           device: DEVICE_ID,
         };
         render(payload, { fromSelf: true });
+        renderDebug(sensor, pred);
         bus?.publish(payload).catch((err) => console.warn("publish failed:", err));
       } catch (err) {
         console.error("inference error:", err);
       }
     },
   });
+  // Count raw events so the debug panel shows actual sensor rate.
+  const origHandler = window.addEventListener;
+  window.addEventListener("devicemotion", bumpEventRate, { passive: true });
   sensor.start();
   isTracking = true;
   setStatus("tracking", "tracking");
@@ -144,6 +189,7 @@ function stopTracking() {
   sensor?.stop();
   sensor = null;
   isTracking = false;
+  window.removeEventListener("devicemotion", bumpEventRate);
   if (wakeLock?.release) { wakeLock.release().catch(() => {}); wakeLock = null; }
   els.btnTrack.classList.remove("hidden");
   els.btnStop.classList.add("hidden");
