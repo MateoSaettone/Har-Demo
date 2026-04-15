@@ -432,6 +432,37 @@ def main():
             (0, "Next step: collect labeled data on our own phones and retrain for the target domain"),
         ])
 
+    # --- NEW Slide: Thank You / Questions (appended to the end)
+    thanks_slide = duplicate_slide(prs, conc_slide)
+    set_title(thanks_slide, "Thank You")
+    # Replace the content placeholder with a centered message.
+    for sh in thanks_slide.shapes:
+        if sh.has_text_frame and sh.name.startswith("Content Placeholder"):
+            tf = sh.text_frame
+            tf.clear()
+            p0 = tf.paragraphs[0]
+            p0.alignment = PP_ALIGN.CENTER
+            r = p0.add_run()
+            r.text = "Questions?"
+            r.font.size = Pt(44)
+            r.font.bold = True
+
+            for line, size, bold in [
+                ("", 18, False),
+                ("Tomas Pastore Godoy  ·  Mateo Saettone  ·  Ethan Thompson", 20, True),
+                ("CIS4930 – Wireless and Mobile Computing", 16, False),
+                ("", 10, False),
+                ("Live demo:  har-demo-cis4930.vercel.app", 18, False),
+                ("Source:  github.com/MateoSaettone/Har-Demo", 14, False),
+            ]:
+                p = tf.add_paragraph()
+                p.alignment = PP_ALIGN.CENTER
+                run = p.add_run()
+                run.text = line
+                run.font.size = Pt(size)
+                run.font.bold = bold
+            break
+
     # --- Reorder: put the two Results slides right after Training Pipeline (index 7)
     # Current order after adds: [0..6, 7 TrainingPipeline, 8 FinalProduct, 9 Limitations,
     #                            10 Conclusion, 11 Results-numbers, 12 Results-CM]
