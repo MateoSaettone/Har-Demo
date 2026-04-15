@@ -432,6 +432,99 @@ def main():
             (0, "Next step: collect labeled data on our own phones and retrain for the target domain"),
         ])
 
+    # --- NEW Slide: How It Works – Tech Stack & Data Flow
+    how_slide = duplicate_slide(prs, template)
+    set_title(how_slide, "How It Works – Tech Stack & Data Flow")
+    # Replace the content placeholder with a two-column description.
+    how_body = None
+    for sh in how_slide.shapes:
+        if sh.has_text_frame and sh.name.startswith("Content Placeholder"):
+            how_body = sh
+            break
+    if how_body is not None:
+        set_bullets(how_body, [
+            (0, "Data flow (end-to-end, in-browser)"),
+            (1, "Phone opens har-demo-cis4930.vercel.app – a Progressive Web App loads"),
+            (1, "iOS/Android DeviceMotion API streams accel + gyro at 50–100 Hz"),
+            (1, "Sliding 2.56 s window (128 samples × 9 channels, matches UCI HAR)"),
+            (1, "ONNX Runtime Web runs the 1D CNN on-device via WebAssembly – no server"),
+            (1, "Every ~0.32 s a prediction is published to Supabase Realtime Broadcast"),
+            (1, "Any other device on the same URL auto-joins as a viewer and mirrors the label"),
+            (0, "Tech stack"),
+            (1, "Frontend: vanilla HTML + ES modules (no framework, no build step)"),
+            (1, "Inference: ONNX Runtime Web (WASM backend) – model is ~170 KB"),
+            (1, "Realtime: Supabase Broadcast – ephemeral pub/sub, no tables or RLS"),
+            (1, "Hosting: Vercel static deployment, auto-redeployed on every git push"),
+            (1, "Training: Python · TensorFlow / Keras · tf2onnx · scikit-learn (RF baseline)"),
+            (1, "Source: github.com/MateoSaettone/Har-Demo"),
+        ])
+
+    # --- NEW Slide: Live Web App – UI Walkthrough (3 screenshots)
+    ui_slide = duplicate_slide(prs, template)
+    set_title(ui_slide, "Live Web App – UI Walkthrough")
+    # Remove the content placeholder – we use picture + caption layout instead.
+    for sh in list(ui_slide.shapes):
+        if sh.has_text_frame and sh.name.startswith("Content Placeholder"):
+            sh.element.getparent().remove(sh.element)
+
+    shot_dir = HERE / "screenshots"
+    shots = [
+        ("ui_idle.png",            "Idle state – awaiting a tracker"),
+        ("ui_laying.png",          "Live prediction streamed to a viewer"),
+        ("ui_walking_details.png", "Project details expanded on the viewer"),
+    ]
+    # Layout math for 13.33 × 7.5 slide: 3 images across with equal gutters.
+    top = Inches(1.45)
+    img_w = Inches(4.10)
+    img_h = Inches(2.15)   # matches 1920×1004 aspect ratio
+    gutter = Inches(0.20)
+    total_w = img_w * 3 + gutter * 2
+    left0 = (prs.slide_width - total_w) // 2
+    cap_top = top + img_h + Inches(0.10)
+    for i, (fname, caption) in enumerate(shots):
+        left = left0 + (img_w + gutter) * i
+        ui_slide.shapes.add_picture(
+            str(shot_dir / fname), left, top, width=img_w, height=img_h
+        )
+        cap_box = ui_slide.shapes.add_textbox(
+            left, cap_top, img_w, Inches(0.55)
+        )
+        tf = cap_box.text_frame
+        tf.word_wrap = True
+        p = tf.paragraphs[0]
+        p.alignment = PP_ALIGN.CENTER
+        r = p.add_run()
+        r.text = caption
+        r.font.size = Pt(12)
+        r.font.bold = True
+        r.font.color.rgb = RGBColor(0x22, 0x22, 0x22)
+
+    # A descriptive paragraph under the three screenshots.
+    desc = ui_slide.shapes.add_textbox(
+        Inches(0.7), Inches(4.55), Inches(11.9), Inches(2.4)
+    )
+    dtf = desc.text_frame
+    dtf.word_wrap = True
+    for i, (text, size, bold) in enumerate([
+        ("Single URL, two auto-detected roles.", 16, True),
+        ("A device becomes a tracker the moment it taps Start tracking; every other device on the URL "
+         "automatically becomes a viewer and mirrors the live label in real time — no pairing, no codes, "
+         "no second app. The huge centered label is sized for readability from across a room when the "
+         "phone is mirrored to a projector.", 13, False),
+        ("", 6, False),
+        ("On-screen chrome stays minimal: team chips, expandable Project Details with course / "
+         "instructor / school / dataset / model / pipeline / repo, a Debug panel exposing the raw "
+         "9-channel sensor stream and per-class probabilities, and a status pill (idle · viewing · "
+         "tracking) in the top-right corner.", 13, False),
+    ]):
+        p = dtf.paragraphs[0] if i == 0 else dtf.add_paragraph()
+        p.alignment = PP_ALIGN.LEFT
+        r = p.add_run()
+        r.text = text
+        r.font.size = Pt(size)
+        r.font.bold = bold
+        r.font.color.rgb = RGBColor(0x1c, 0x1c, 0x1c)
+
     # --- NEW Slide: Thank You / Questions (appended to the end)
     thanks_slide = duplicate_slide(prs, conc_slide)
     set_title(thanks_slide, "Thank You")
@@ -469,6 +562,13 @@ def main():
     # Desired: insert 11,12 at index 8 (after Training Pipeline).
     move_slide(prs, results_slide, 8)
     move_slide(prs, cm_slide, 9)
+    # After the moves above we have:
+    #   0..9 previous, 10 Final Product, 11 Limits, 12 Conclusion,
+    #   13 How It Works, 14 UI Walkthrough, 15 Thank You
+    # Slide them in after Final Product so the order is:
+    #   Final Product → How It Works → UI Walkthrough → Limitations → ...
+    move_slide(prs, how_slide, 11)
+    move_slide(prs, ui_slide, 12)
 
     prs.save(OUT)
     shutil.copy2(OUT, DOWNLOADS_OUT)
